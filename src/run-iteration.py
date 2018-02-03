@@ -17,23 +17,18 @@ print('Preparing to run {0} iterations...'.format(1))
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data'))
 shutil.copyfile('./input.txt', './output.txt')
 
-current_iter = './output.txt'
-prev_iter = './output1.txt'
-
 for i in range(1, iterations + 1):
 
-    # Swap files for iterations
-    temp = current_iter
-    current_iter = prev_iter
-    prev_iter = temp
-
     # Run the iteration
-    command = 'python pagerank_map.py < {0} | sort | python pagerank_reduce.py | python process_map.py | sort | ' \
-              'python process_reduce.py > {1}'.format(prev_iter, current_iter)
-    os.system(command)
+    os.system('python pagerank_map.py < {0}.txt > {1}.txt'.format('output', '1_aft_pagerank_map'))
+    os.system('sort < {0}.txt > {1}.txt'.format('1_aft_pagerank_map', '2_aft_sort'))
+    os.system('python pagerank_reduce.py < {0}.txt > {1}.txt'.format('2_aft_sort', '3_aft_pagerank_reduce'))
+    os.system('python process_map.py < {0}.txt > {1}.txt'.format('3_aft_pagerank_reduce', '4_aft_process_map'))
+    os.system('sort < {0}.txt > {1}.txt'.format('4_aft_process_map', '5_aft_sort'))
+    os.system('python process_reduce.py < {0}.txt > {1}.txt'.format('5_aft_sort', 'output'))
 
     # Print stats,
-    with open(current_iter) as f:
+    with open('./output.txt') as f:
         total = 0
         all_lines_are_final = True
         for k, l in enumerate(f):
@@ -51,13 +46,6 @@ for i in range(1, iterations + 1):
             print('Generated final nodes!')
             break
 
-
     if i > MAX_ITERATIONS:
         print('Reached maximum number of iterations! ({0})'.format(MAX_ITERATIONS))
         break
-
-if current_iter is not './output.txt':
-    shutil.copyfile(current_iter, './output.txt')
-    os.remove(current_iter)
-else:
-    os.remove(prev_iter)

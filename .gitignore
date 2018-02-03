@@ -1,6 +1,7 @@
 # Test runs
 input.txt
 output.txt
+src/data/*.txt
 
 # JetBrains IDEs, Vim swap
 .idea/
