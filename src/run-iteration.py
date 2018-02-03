@@ -38,14 +38,19 @@ for i in range(1, iterations + 1):
         all_lines_are_final = True
         for k, l in enumerate(f):
             total += 1
-            if not l.startswith('FinalNode'):
+            if not l.startswith('FinalRank'):
                 all_lines_are_final = False
 
         print("Iteration {0}: {1} lines in output.txt".format(i, total))
 
+        if total < 1:
+            print('File is empty, stopping iteration process!')
+            break
+
         if all_lines_are_final:
             print('Generated final nodes!')
             break
+
 
     if i > MAX_ITERATIONS:
         print('Reached maximum number of iterations! ({0})'.format(MAX_ITERATIONS))

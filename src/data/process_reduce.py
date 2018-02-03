@@ -8,9 +8,5 @@ import random
 #
 
 for line in sys.stdin:
-    print_final = random.random() < 0.7
-    if print_final:
-        sys.stdout.write('FinalNode: 123\n')
-    else:
-        sys.stdout.write(line)
+    sys.stdout.write(line)
 
