@@ -21,10 +21,10 @@ for i in range(1, iterations + 1):
 
     # Run the iteration
     os.system('python pagerank_map.py < {0}.txt > {1}.txt'.format('output', '1_aft_pagerank_map'))
-    os.system('sort < {0}.txt > {1}.txt'.format('1_aft_pagerank_map', '2_aft_sort'))
+    os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('1_aft_pagerank_map', '2_aft_sort'))
     os.system('python pagerank_reduce.py < {0}.txt > {1}.txt'.format('2_aft_sort', '3_aft_pagerank_reduce'))
     os.system('python process_map.py < {0}.txt > {1}.txt'.format('3_aft_pagerank_reduce', '4_aft_process_map'))
-    os.system('sort < {0}.txt > {1}.txt'.format('4_aft_process_map', '5_aft_sort'))
+    os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('4_aft_process_map', '5_aft_sort'))
     os.system('python process_reduce.py < {0}.txt > {1}.txt'.format('5_aft_sort', 'output'))
 
     # Print stats,

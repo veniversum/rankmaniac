@@ -54,7 +54,7 @@ if count is 20:
     for node in nodes:
         node.emit_as_final()
 else:
-    SHRINKING_COEFFICIENT = 0.7
+    SHRINKING_COEFFICIENT = 0.9
     upper_slice = int(max(20, round(count * SHRINKING_COEFFICIENT)))
     for node in nodes[0:upper_slice]:
         node.re_emit()
