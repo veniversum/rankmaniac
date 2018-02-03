@@ -1,3 +1,7 @@
+# Test runs
+input.txt
+output.txt
+
 # JetBrains IDEs, Vim swap
 .idea/
 *.swp

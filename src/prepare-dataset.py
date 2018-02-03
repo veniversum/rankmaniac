@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+from os import path
+import sys
+import shutil
+import argparse
+
+print("Preparing to write data set to `data/input.txt`...\n")
+
+if len(sys.argv) < 2 or sys.argv[1] not in ['1', '2']:
+    print("Specify data set number:")
+    print("  1   - GNPn100p05 data set")
+    print("  2   - EmailEnron data set")
+    exit(0)
+
+dataset = 'EmailEnron' if sys.argv[1] == '1' else 'GNPn100p05'
+source = path.join(path.dirname(path.abspath(__file__)), 'local_test_data', dataset)
+target = path.join(path.dirname(path.abspath(__file__)), 'data', 'input.txt')
+
+shutil.copyfile(source, target)
+print("Saved {0} into `data/input.txt`!".format(dataset))
