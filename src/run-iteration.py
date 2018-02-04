@@ -9,6 +9,20 @@ from score import Scorer
 MAX_ITERATIONS = 50
 
 
+def extract(f):
+    import re
+    pattern = re.compile(r'.*?:(\d+)\t(.*?),.*')
+    pages = []
+    for ll in f.readlines():
+        match = pattern.match(ll)
+        if match:
+            n_id = match.group(1)
+            rank = float(match.group(2))
+            if n_id != '-1':
+                pages.append((n_id, rank))
+    return sorted(pages, key=lambda p: p[1], reverse=True)
+
+
 def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
     scorer = None
     if evalutation_path:
@@ -48,6 +62,11 @@ def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
                 print 'Generated final nodes!'
                 break
 
+            f.seek(0)
+
+            predictions = [pr[0] for pr in extract(f)]
+            scorer.score_raw(predictions)
+
         if i > MAX_ITERATIONS:
             print 'Reached maximum number of iterations! ({0})'.format(MAX_ITERATIONS)
             break
@@ -56,7 +75,6 @@ def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
 
 
 if __name__ == '__main__':
-    iterations = None
     kwargs = {}
     if len(sys.argv) < 2:
         print 'You can pass an argument specifying the # of iterations. Using default value of `{0}`.'.format(

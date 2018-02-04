@@ -3,7 +3,7 @@
 import sys
 from collections import deque
 
-MAX_ITER = 1
+MAX_ITER = 50
 NUM_WALKS = 50
 
 
