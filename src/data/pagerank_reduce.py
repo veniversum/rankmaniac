@@ -20,30 +20,28 @@ old_pagerank = 0
 outlinks = None
 
 for line in sys.stdin:
-
-    line = line.replace('\n', '')
-    parts = line.split('\t')
+    parts = line.strip().split('\t')
     node_id = int(parts[0])
     content = parts[1]
 
-    if node_id is not prev_id:
-        if outlinks is not None:
+    if node_id != prev_id:
+        if prev_id is not None:  # Not before first node; emit previous node
             emit_node_info(prev_id, pagerank, old_pagerank, outlinks)
 
+        # New node
         prev_id = node_id
         pagerank = 0
         old_pagerank = 0
         outlinks = None
 
-    if content.startswith('x'):
+    if content.startswith('x'):  # Contributing pagerank
         pagerank += float(content[1:])
-    else:
+    else:  # Node metadata
         values = content.split(',')
         old_pagerank = values[0]
         outlinks = ','.join(values[2:])
         
 
-# Make sure we emit data for the last tuple in the loop
-if outlinks is not None:
-    emit_node_info(prev_id, pagerank, old_pagerank, outlinks)
+# Make sure we emit data for the last node
+emit_node_info(prev_id, pagerank, old_pagerank, outlinks)
 
