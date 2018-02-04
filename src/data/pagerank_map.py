@@ -47,7 +47,11 @@ class Node:
 for line in sys.stdin:
     node = Node(line)
 
-    if node.outlinks_count is not 0:    
+    if node.outlinks_count is 0:
+        # If no outlinks, treat as if all PageRank flows back into itself
+        # (See HW 4 problem 2)
+        Node.emit_node_pagerank_line(node.id, node.pageRank)
+    else:
         ratio = node.pageRank / node.outlinks_count
         for neighbour in node.outlinks:
             Node.emit_node_pagerank_line(neighbour, ratio)
