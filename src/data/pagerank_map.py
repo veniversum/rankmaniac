@@ -18,7 +18,7 @@ class Node:
 
         parts = node_line.split('\t')
         header = parts[0].split(':')
-        content = parts[1][0:-1]
+        content = parts[1].replace('\n', '')
 
         self.final = header[0] is 'FinalRank'
 
@@ -47,8 +47,9 @@ class Node:
 for line in sys.stdin:
     node = Node(line)
 
-    ratio = node.pageRank / node.outlinks_count
-    for neighbour in node.outlinks:
-        Node.emit_node_pagerank_line(neighbour, ratio)
+    if node.outlinks_count is not 0:    
+        ratio = node.pageRank / node.outlinks_count
+        for neighbour in node.outlinks:
+            Node.emit_node_pagerank_line(neighbour, ratio)
 
     Node.emit_node_content_line(node.id, node.original_content)
