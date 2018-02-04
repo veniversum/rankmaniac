@@ -6,7 +6,7 @@ from collections import deque
 class SortNode:
 
     def __init__(self, line):
-        parts = line.split('\t')
+        parts = line.split('\t', 1)
         self.key = parts[0]
         self.value = parts[1]
 
@@ -23,4 +23,3 @@ nodes.sort(key=lambda x: x.key)
 
 for node in nodes:
     node.re_emit()
-
