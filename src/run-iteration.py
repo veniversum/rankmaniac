@@ -4,31 +4,51 @@ import os
 import sys
 import shutil
 
-iterations = 1
+iterations = 50
 MAX_ITERATIONS = 100
 
 if len(sys.argv) < 2:
-    print('You can pass an argument specifying the # of iterations. Using default value of `{0}`.'.format(iterations))
+    print(
+        'You can pass an argument specifying the # of iterations. Using default value of `{0}`.'.format(
+            iterations))
 else:
     iterations = int(sys.argv[1])
 
-print('Preparing to run {0} iterations...'.format(1))
+print('Preparing to run {0} iterations...'.format(iterations))
 
-os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data'))
-shutil.copyfile('./input.txt', './output.txt')
+curr_script_path = os.path.dirname(os.path.abspath(__file__))
+
+scripts = [
+    'data/pagerank_map.py',
+    'tuple-sort.py',
+    'data/pagerank_reduce.py',
+    'data/process_map.py',
+    'tuple-sort.py',
+    'data/process_reduce.py',
+]
+initial_input = 'local_results/initial_input.txt'
+final_output = 'local_results/final_output.txt'
+files = [
+    'local_results/intermediate/output.txt',
+    'local_results/intermediate/1_aft_pagerank_map.txt',
+    'local_results/intermediate/2_aft_sort.txt',
+    'local_results/intermediate/3_aft_pagerank_reduce.txt',
+    'local_results/intermediate/4_aft_process_map.txt',
+    'local_results/intermediate/5_aft_sort.txt',
+    'local_results/intermediate/output.txt',
+]
+
+# Prepare data set for iteration process
+shutil.copyfile(initial_input, files[0])
 
 for i in range(1, iterations + 1):
 
     # Run the iteration
-    os.system('python pagerank_map.py < {0}.txt > {1}.txt'.format('output', '1_aft_pagerank_map'))
-    os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('1_aft_pagerank_map', '2_aft_sort'))
-    os.system('python pagerank_reduce.py < {0}.txt > {1}.txt'.format('2_aft_sort', '3_aft_pagerank_reduce'))
-    os.system('python process_map.py < {0}.txt > {1}.txt'.format('3_aft_pagerank_reduce', '4_aft_process_map'))
-    os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('4_aft_process_map', '5_aft_sort'))
-    os.system('python process_reduce.py < {0}.txt > {1}.txt'.format('5_aft_sort', 'output'))
+    for j in range(0, len(scripts)):
+        os.system('python {0} < {1} > {2}'.format(scripts[j], files[j], files[j + 1]))
 
     # Print stats,
-    with open('./output.txt') as f:
+    with open(files[-1]) as f:
         total = 0
         all_lines_are_final = True
         for k, l in enumerate(f):
@@ -49,3 +69,6 @@ for i in range(1, iterations + 1):
     if i > MAX_ITERATIONS:
         print('Reached maximum number of iterations! ({0})'.format(MAX_ITERATIONS))
         break
+
+# Copy the final output
+shutil.copyfile(files[-1], final_output)

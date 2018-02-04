@@ -6,7 +6,7 @@ import shutil
 import argparse
 
 if __name__ == '__main__':
-    print("Preparing to write data set to `data/input.txt`...\n")
+    print("Preparing to write data set to `local_results/initial_input.txt`...\n")
 
     choice = None
     if len(sys.argv) < 2 or sys.argv[1] not in ['1', '2']:
@@ -20,8 +20,9 @@ if __name__ == '__main__':
         choice = sys.argv[1]
 
     dataset = 'EmailEnron' if choice == '2' else 'GNPn100p05'
-    source = path.join(path.dirname(path.abspath(__file__)), 'local_test_data', dataset)
-    target = path.join(path.dirname(path.abspath(__file__)), 'data', 'input.txt')
+    script_path = path.dirname(path.abspath(__file__))
+    source = path.join(script_path, 'local_test_data', dataset)
+    target = path.join(script_path, 'local_results', 'initial_input.txt')
 
     shutil.copyfile(source, target)
-    print("Saved {0} into `data/input.txt`!".format(dataset))
+    print("Saved {0} into `local_results/initial_input.txt`!".format(dataset))
