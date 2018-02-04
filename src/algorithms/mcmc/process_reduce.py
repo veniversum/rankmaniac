@@ -3,8 +3,8 @@
 import sys
 from collections import deque
 
-MAX_ITER = 10
-NUM_WALKS = 50.
+MAX_ITER = 50
+NUM_WALKS = 50
 
 class Node:
     # Break down the input line into useful components
