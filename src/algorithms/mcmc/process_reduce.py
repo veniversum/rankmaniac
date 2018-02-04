@@ -3,8 +3,9 @@
 import sys
 from collections import deque
 
-MAX_ITER = 50
+MAX_ITER = 1
 NUM_WALKS = 50
+
 
 class Node:
     # Break down the input line into useful components
@@ -39,13 +40,15 @@ class Node:
             self.outlinks_count = len(self.outlinks)
 
     def re_emit(self):
-        sys.stdout.write('NodeId:{0}\t{1},{2},{3}\n'.format(self.id, self.pageRank, self.oldPageRank, ','.join(self.outlinks)))
+        sys.stdout.write(
+            'NodeId:{0}\t{1},{2},{3}\n'.format(self.id, self.pageRank, self.oldPageRank, ','.join(self.outlinks)))
 
     def emit_as_final(self):
         sys.stdout.write('FinalRank:{0}\t{1}\n'.format(self.pageRank, self.id))
 
+
 queue = deque()
-cur_iter = 0
+cur_iter = 1
 shared_weights = 0
 
 node_list = []
@@ -63,7 +66,7 @@ for line in sys.stdin:
 shared_weights /= len(node_list)
 
 if cur_iter >= MAX_ITER:
-    for node in sorted(node_list, key=lambda n:n.pageRank, reverse=True):
+    for node in sorted(node_list, key=lambda n: n.pageRank, reverse=True):
         node.pageRank += shared_weights
         node.pageRank /= NUM_WALKS
         node.emit_as_final()
