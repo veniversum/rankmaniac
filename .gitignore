@@ -6,6 +6,7 @@ src/data/*.txt
 # JetBrains IDEs, Vim swap
 .idea/
 *.swp
+*.swo
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

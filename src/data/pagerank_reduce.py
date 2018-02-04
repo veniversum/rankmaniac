@@ -2,16 +2,16 @@
 
 import sys
 
+DAMPING_FACTOR = 0.85
+
 
 def emit_node_info(node_id, new_pagerank, old_pagerank, outlinks):
-    #pagerank = 1 - DAMPING_FACTOR + (DAMPING_FACTOR * pagerank)
+    new_pagerank = (1 - DAMPING_FACTOR) + (DAMPING_FACTOR * new_pagerank)
     if outlinks:
         sys.stdout.write('NodeId:{0}\t{1},{2},{3}\n'.format(node_id, new_pagerank, old_pagerank, outlinks))
     else:
         sys.stdout.write('NodeId:{0}\t{1},{2}\n'.format(node_id, new_pagerank, old_pagerank))
 
-
-DAMPING_FACTOR = 1
 
 prev_id = None
 
