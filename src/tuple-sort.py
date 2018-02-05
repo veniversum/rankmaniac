@@ -11,7 +11,7 @@ class SortNode:
         self.value = parts[1]
 
     def re_emit(self):
-        sys.stdout.write('{0}\t{1}'.format(self.key, self.value))
+        sys.stdout.write(self.key + '\t' + self.value)
 
 queue = deque()
 

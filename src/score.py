@@ -8,11 +8,12 @@ class Scorer(object):
 
     def score_raw(self, predict_list):
         cum_error = 0
-        for i, t in enumerate(self.target):
+        for i, t in enumerate(predict_list[:20]):
             try:
-                cum_error += (predict_list.index(t) - i) ** 2
+                cum_error += (self.target.index(t) - i) ** 2
             except ValueError:
-                raise Exception('Predictions did not include top 20!')
+                cum_error += 10
+                # raise Exception('Predictions did not include top 20!')
 
         print 'Total error: %d' % cum_error
 

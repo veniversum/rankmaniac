@@ -3,6 +3,7 @@
 import os
 import sys
 import shutil
+import time
 
 from score import Scorer
 
@@ -11,16 +12,15 @@ MAX_ITERATIONS = 50
 
 def extract(f):
     import re
-    pattern = re.compile(r'.*?:(\d+)\t(.*?),.*')
+    pattern = re.compile(r'(\d+).*')
     pages = []
     for ll in f.readlines():
         match = pattern.match(ll)
         if match:
             n_id = match.group(1)
-            rank = float(match.group(2))
             if n_id != '-1':
-                pages.append((n_id, rank))
-    return sorted(pages, key=lambda p: p[1], reverse=True)
+                pages.append(n_id)
+    return pages
 
 
 def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
@@ -29,10 +29,12 @@ def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
         scorer = Scorer(evalutation_path)
     os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data'))
     shutil.copyfile('./input.txt', './output.txt')
+    totaltime = 0.
 
     for i in range(1, iterations + 1):
 
         # Run the iteration
+        start = time.time()
         os.system(
             'python {0}pagerank_map.py < {1}.txt > {2}.txt'.format(algorithm_path, 'output', '1_aft_pagerank_map'))
         os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('1_aft_pagerank_map', '2_aft_sort'))
@@ -42,6 +44,8 @@ def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
                                                                         '4_aft_process_map'))
         os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('4_aft_process_map', '5_aft_sort'))
         os.system('python {0}process_reduce.py < {1}.txt > {2}.txt'.format(algorithm_path, '5_aft_sort', 'output'))
+        end = time.time()
+        totaltime += end - start
 
         # Print stats,
         with open('./output.txt') as f:
@@ -52,7 +56,9 @@ def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
                 if not l.startswith('FinalRank'):
                     all_lines_are_final = False
 
-            print "Iteration {0}: {1} lines in output.txt".format(i, total)
+            print "Iteration {0}: {1} lines in output.txt. Round time: {2} Total time: {3}".format(i, total,
+                                                                                                   end - start,
+                                                                                                   totaltime)
 
             if total < 1:
                 print 'File is empty, stopping iteration process!'
@@ -64,8 +70,9 @@ def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
 
             f.seek(0)
 
-            predictions = [pr[0] for pr in extract(f)]
-            scorer.score_raw(predictions)
+            predictions = extract(f)
+            if scorer:
+                scorer.score_raw(predictions)
 
         if i > MAX_ITERATIONS:
             print 'Reached maximum number of iterations! ({0})'.format(MAX_ITERATIONS)
@@ -78,7 +85,7 @@ if __name__ == '__main__':
     kwargs = {}
     if len(sys.argv) < 2:
         print 'You can pass an argument specifying the # of iterations. Using default value of `{0}`.'.format(
-            iterations)
+            MAX_ITERATIONS)
     else:
         kwargs['iterations'] = int(sys.argv[1])
 

@@ -20,13 +20,13 @@ class Node:
         header = parts[0].split(':')
         content = parts[1].replace('\n', '')
 
-        self.final = header[0] is 'FinalRank'
+        self.final = header[0] == 'FinalRank'
 
         if self.final:
             self.id = content
             self.pageRank = float(header[1])
         else:
-            self.id = header[1]
+            self.id = header[0]
             values = content.split(',')
             self.pageRank = float(values[0])
             self.oldPageRank = float(values[1])
