@@ -29,7 +29,7 @@ public:
         start = end + 1;
         end = content.find(',', start);
         if (end != string::npos) {
-//            oldPageRank = stod(content.substr(start, end - start));
+            oldPageRank = stod(content.substr(start, end - start));
             start = end + 1;
             outlinks_str = content.substr(start);
             if (expand_outlinks) {
@@ -42,8 +42,8 @@ public:
                 }
                 outlinks_count = outlinks.size();
             }
-//        } else {
-//            oldPageRank = stod(content.substr(start));
+        } else {
+            oldPageRank = stod(content.substr(start));
         }
     }
 

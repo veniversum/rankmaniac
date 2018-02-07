@@ -6,15 +6,16 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 //#include <fstream>
 #include "node.h"
 
 #define MAX_ITER 50
 #define PATIENCE 1
-#define STRICTNESS 40
+#define STRICTNESS 20
 #define ALPHA 0.85
 #define shared_weights (1.0 - ALPHA)
-#define EPSILON 0.00001
+#define EPSILON 0.001
 
 using namespace std;
 
@@ -48,6 +49,8 @@ int main() {
     uint32_t new_hash = 0;
     uint8_t num_rounds_no_change = 0;
 
+    double global_delta = 0;
+
     while (cin >> header >> content) {
         if (header[0] == 'I') {
             //INFO
@@ -67,6 +70,9 @@ int main() {
             continue;
         } else {
             nodes.emplace_back(header, content, false);
+            Node node = nodes.back();
+            global_delta += std::abs(
+                    node.pageRank + shared_weights - node.oldPageRank);
         }
     }
 
@@ -80,7 +86,8 @@ int main() {
         num_rounds_no_change = 0;
     }
 
-    if (cur_iter >= MAX_ITER || num_rounds_no_change >= PATIENCE) {
+    if (cur_iter >= MAX_ITER || num_rounds_no_change >= PATIENCE ||
+        global_delta < EPSILON * nodes.size()) {
         uint8_t cnt = 0;
         for (auto it = nodes.begin();
              it != nodes.end() && cnt < 20; ++it, ++cnt) {
