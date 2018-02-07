@@ -8,8 +8,12 @@
 //#include <fstream>
 #include "node.h"
 
+#define ALPHA 0.85
+#define shared_weights (1.0 - ALPHA)
+
 using namespace std;
 
+// Global reduce step
 int main() {
 //        ifstream in(
 //            "C:\\Users\\Veniversum\\Documents\\a.School\\Caltech\\CS144\\rankmaniac\\src\\temp");
@@ -33,7 +37,7 @@ int main() {
         }
     }
     for (auto &node_pair : nodes) {
-        node_pair.second.pageRank = weights[node_pair.first];
+        node_pair.second.pageRank += weights[node_pair.first] + shared_weights;
         node_pair.second.reemit();
     }
 

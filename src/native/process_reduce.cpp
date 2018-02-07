@@ -14,7 +14,6 @@
 #define PATIENCE 1
 #define STRICTNESS 20
 #define ALPHA 0.85
-#define shared_weights (1.0 - ALPHA)
 #define EPSILON 0.001
 
 using namespace std;
@@ -72,7 +71,7 @@ int main() {
             nodes.emplace_back(header, content, false);
             Node node = nodes.back();
             global_delta += std::abs(
-                    node.pageRank + shared_weights - node.oldPageRank);
+                    node.pageRank - node.oldPageRank);
         }
     }
 
@@ -98,7 +97,6 @@ int main() {
         printf("I\tN%d\n", num_rounds_no_change);
         printf("I\tH%u\n", new_hash);
         for (auto it : nodes) {
-            it.pageRank += shared_weights;
             it.reemit();
         }
     }

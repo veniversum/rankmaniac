@@ -14,6 +14,7 @@ using namespace std;
 
 class Node {
 public:
+    bool internal = true;
     string id;
     double pageRank{};
     double oldPageRank = 0;
