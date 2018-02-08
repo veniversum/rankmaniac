@@ -1,8 +1,16 @@
 # Algorithm
 
-The algorithm implemented is the Eager Pagerank algorithm outlined in [these](https://www.cs.purdue.edu/homes/suresh/papers/eagermap09.pdf) [papers](https://www.cs.purdue.edu/homes/suresh/papers/cluster10.pdf).
-The algorithm partitions the graph into global MR and local MR steps, by introducing the notion of partial synchronicity.
+The algorithm implemented draws inspiration from Eager Pagerank approach outlined in [these](https://www.cs.purdue.edu/homes/suresh/papers/eagermap09.pdf) [papers](https://www.cs.purdue.edu/homes/suresh/papers/cluster10.pdf).
+The approach relaxes the requirement of global synchronization in traditional iterative MapReduce implementation, noting that:
 >The fundamental observation here is that it takes fewer iterations to converge for a graph having already converged sub-graphs. The trends are more pronounced when the graph follows the power-law distribution more closely. '
+
+This observation allows to use the Gauss-Seidel iteration method for finding convergence, which required total ordering of update operations (and knowing the entire adjacency matrix) that are infeasible for distributed computation using MapReduce.
+By relaxing the sychronization constraint, we only need to enforce a partial ordering of update operations on the nodes in the subgraph within a each reducer node, which is partitioned such that each MapReduce runner can easily handle the computation required.
+Edge cases where cross subgraph boundaries are handled in the same manner as the traditional iteration method. While performance gain is most significant if using a min-cut partitioning (or natural partitioning from web crawler behavior), there is still a significant improvement in the number of iterations required till convergence when partitions are selected randomly.
+The convergence behaviour is that of Gauss-Seidel when there is only 1 reducer, and degrades to Jacobian iteration as number of reducers approaches the number of nodes in the graph. Thus, our implementation should converge in strictly less iteration that naive Jacobian iteration approaches.
+
+The details of the Gauss-Seidel method is described in [this paper](http://www.w3c.ethz.ch/CDstore/www2002/poster/173.pdf).
+
 
 It is crucial that an appropriate number of nodes be chosen such that the graph fits on disk (hard requirement) and more preferably in memory (soft requirement).
 The paper highlights the tradeoff between a reduced communication overhead, and the extra work in terms of CPU ops due to partial synchronization.
