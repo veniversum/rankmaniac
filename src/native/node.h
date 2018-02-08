@@ -9,21 +9,23 @@
 #include <sstream>
 #include <iostream>
 #include <cstdio>
+#define NUM_REDUCERS 10
 
 using namespace std;
 
 class Node {
 public:
-    bool internal = true;
-    string id;
+    uint32_t id;
+    uint8_t block_id;
     double pageRank{};
     double oldPageRank = 0;
-    vector<string> outlinks;
+    vector<uint32_t > outlinks;
     int outlinks_count = 0;
     string outlinks_str = "";
 
-    Node(const string &header, const string &content, bool expand_outlinks) {
+    Node(const uint32_t header, const string &content, bool expand_outlinks) {
         id = header;
+        block_id = static_cast<uint8_t>(header % NUM_REDUCERS);
         auto start = 0U;
         auto end = content.find(',');
         pageRank = stod(content.substr(start, end - start));
@@ -39,7 +41,7 @@ public:
                 while (ss.good()) {
                     getline(ss, substr, ',');
                     if (!substr.empty())
-                        outlinks.push_back(substr);
+                        outlinks.push_back(stoul(substr));
                 }
                 outlinks_count = outlinks.size();
             }
@@ -52,18 +54,37 @@ public:
 //        cout << id << '\t' << pageRank << ',' << oldPageRank << ','
 //             << outlinks_str << '\n';
         if (!outlinks_str.empty())
-            printf("%s\t%.10g,%.10g,%s\n", id.c_str(), pageRank, oldPageRank,
+            printf("%u\t%.10g,%.10g,%s\n", id, pageRank, oldPageRank,
                    outlinks_str.c_str());
         else
-            printf("%s\t%.10g,%.10g\n", id.c_str(), pageRank, oldPageRank);
+            printf("%u\t%.10g,%.10g\n", id, pageRank, oldPageRank);
+    }
+
+    inline void reemit_block() {
+//        cout << id << '\t' << pageRank << ',' << oldPageRank << ','
+//             << outlinks_str << '\n';
+        if (!outlinks_str.empty())
+            printf("%u\tN %u %.10g,%.10g,%s\n", block_id, id, pageRank, oldPageRank,
+                   outlinks_str.c_str());
+        else
+            printf("%u\tN %u %.10g,%.10g\n", block_id, id, pageRank, oldPageRank);
     }
 
     inline void emitAsFinal() {
 //        cout << "FinalRank:" << pageRank << '\t' << id << '\n';
-        printf("FinalRank:%.10g\t%s\n", pageRank, id.c_str());
+        printf("FinalRank:%.10g\t%u\n", pageRank, id);
+    }
+
+    inline double outgoingPR() {
+        if (outlinks_count > 0)
+            return pageRank / outlinks_count;
+        return pageRank;
     }
 };
 
+static inline uint8_t convert_to_block_id(const uint32_t id) {
+    return static_cast<uint8_t>(id % NUM_REDUCERS);
+}
 
 
 //decode(char *content) {

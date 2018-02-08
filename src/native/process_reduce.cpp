@@ -10,10 +10,11 @@
 //#include <fstream>
 #include "node.h"
 
-#define MAX_ITER 50
+#define MAX_ITER 12
 #define PATIENCE 1
 #define STRICTNESS 20
 #define ALPHA 0.85
+#define shared_weights (1.0 - ALPHA)
 #define EPSILON 0.001
 
 using namespace std;
@@ -24,7 +25,7 @@ uint32_t hashTopFew(const vector<Node> &nodes) {
     uint32_t hash = 1;
     for (auto it = nodes.begin();
          it != nodes.end() && cnt < STRICTNESS; ++it, ++cnt) {
-        hash = hash * 31 + stol(it->id);
+        hash = hash * 31 + it->id;
     }
     return hash;
 }
@@ -49,7 +50,6 @@ int main() {
     uint8_t num_rounds_no_change = 0;
 
     double global_delta = 0;
-
     while (cin >> header >> content) {
         if (header[0] == 'I') {
             //INFO
@@ -68,25 +68,30 @@ int main() {
             }
             continue;
         } else {
-            nodes.emplace_back(header, content, false);
+            nodes.emplace_back(stoul(header), content, false);
             Node node = nodes.back();
-            global_delta += std::abs(
-                    node.pageRank - node.oldPageRank);
+            global_delta += abs(node.pageRank - node.oldPageRank) / node.pageRank;
+        }
+    }
+    global_delta /= nodes.size();
+
+    int additional_sort = max(0, STRICTNESS - 20);
+
+    partial_sort(nodes.begin(), nodes.begin() + 20 + additional_sort,
+                 nodes.end(), cmp);
+
+    if (global_delta >= EPSILON) {
+        new_hash = hashTopFew(nodes);
+
+        if (new_hash == old_hash) {
+            num_rounds_no_change++;
+        } else {
+            num_rounds_no_change = 0;
         }
     }
 
-    partial_sort(nodes.begin(), nodes.begin() + STRICTNESS, nodes.end(), cmp);
-
-    new_hash = hashTopFew(nodes);
-
-    if (new_hash == old_hash) {
-        num_rounds_no_change++;
-    } else {
-        num_rounds_no_change = 0;
-    }
-
     if (cur_iter >= MAX_ITER || num_rounds_no_change >= PATIENCE ||
-        global_delta < EPSILON * nodes.size()) {
+        global_delta < EPSILON) {
         uint8_t cnt = 0;
         for (auto it = nodes.begin();
              it != nodes.end() && cnt < 20; ++it, ++cnt) {
