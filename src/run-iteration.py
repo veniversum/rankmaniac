@@ -34,18 +34,62 @@ def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
     for i in range(1, iterations + 1):
 
         # Run the iteration
+        initial = time.time()
+
+        # os.system(
+        #     'python {0}pagerank_map.py < {1}.txt > {2}.txt'.format(algorithm_path, 'output', '1_aft_pagerank_map'))
+        # end = time.time()
+        # print 'PageRank map took %f s' % (end - start)
+        # start = time.time()
+        # # os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('1_aft_pagerank_map', '2_aft_sort'))
+        # os.system('python {0}pagerank_reduce.py < {1}.txt > {2}.txt'.format(algorithm_path, '1_aft_pagerank_map',
+        #                                                           '3_aft_pagerank_reduce'))
+        # end = time.time()
+        # print 'PageRank map took %f s' % (end - start)
+        # start = time.time()
+        # os.system('python {0}process_map.py < {1}.txt > {2}.txt'.format(algorithm_path, '3_aft_pagerank_reduce',
+        #                                                       '4_aft_process_map'))
+        # end = time.time()
+        # print 'PageRank map took %f s' % (end - start)
+        # start = time.time()
+        # # os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('4_aft_process_map', '5_aft_sort'))
+        # os.system('python {0}process_reduce.py < {1}.txt > {2}.txt'.format(algorithm_path, '4_aft_process_map', 'output'))
+        # end = time.time()
+        # print 'PageRank map took %f s' % (end - start)
+        # totaltime += end - initial
+
+        # os.system('split -l 200000 output.txt')
+        print 'Splitting file done!'
         start = time.time()
-        os.system(
-            'python {0}pagerank_map.py < {1}.txt > {2}.txt'.format(algorithm_path, 'output', '1_aft_pagerank_map'))
-        os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('1_aft_pagerank_map', '2_aft_sort'))
-        os.system('python {0}pagerank_reduce.py < {1}.txt > {2}.txt'.format(algorithm_path, '2_aft_sort',
-                                                                            '3_aft_pagerank_reduce'))
-        os.system('python {0}process_map.py < {1}.txt > {2}.txt'.format(algorithm_path, '3_aft_pagerank_reduce',
-                                                                        '4_aft_process_map'))
-        os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('4_aft_process_map', '5_aft_sort'))
-        os.system('python {0}process_reduce.py < {1}.txt > {2}.txt'.format(algorithm_path, '5_aft_sort', 'output'))
+        os.system('{0}pagerank_map < {1} > {2}.txt'.format(algorithm_path, 'output.txt', '1_aft_pagerank_map'))
+        # os.system('{0}pagerank_map < {1} >> {2}.txt'.format(algorithm_path, 'xab', '1_aft_pagerank_map'))
         end = time.time()
-        totaltime += end - start
+        print 'PageRank map took %f s' % (end - start)
+
+        num_reducers = 10
+
+        os.system('rm -f reduce*.txt')
+        os.system('python shuffle.py {0} < {1}.txt'.format(num_reducers, '1_aft_pagerank_map'))
+
+        # os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('1_aft_pagerank_map', '2_aft_sort'))
+        start = time.time()
+        os.system('rm -f 3_aft_pagerank_reduce.txt')
+        for j in range(num_reducers):
+            os.system('{0}pagerank_reduce < reduce{1}.txt >> {2}.txt'.format(algorithm_path, j, '3_aft_pagerank_reduce'))
+        end = time.time()
+        print 'PageRank reduce took %f s' % (end - start)
+        start = time.time()
+        os.system('{0}process_map < {1}.txt > {2}.txt'.format(algorithm_path, '3_aft_pagerank_reduce',
+                                                   '4_aft_process_map'))
+        end = time.time()
+        print 'Process map took %f s' % (end - start)
+
+        # os.system('python ../tuple-sort.py < {0}.txt > {1}.txt'.format('4_aft_process_map', '5_aft_sort'))
+        start = time.time()
+        os.system('{0}process_reduce < {1}.txt > {2}.txt'.format(algorithm_path, '4_aft_process_map', 'output'))
+        end = time.time()
+        print 'Process reduce took %f s' % (end - start)
+        totaltime += end - initial
 
         # Print stats,
         with open('./output.txt') as f:
@@ -57,7 +101,7 @@ def run(iterations=MAX_ITERATIONS, algorithm_path='./', evalutation_path=None):
                     all_lines_are_final = False
 
             print "Iteration {0}: {1} lines in output.txt. Round time: {2} Total time: {3}".format(i, total,
-                                                                                                   end - start,
+                                                                                                   end - initial,
                                                                                                    totaltime)
 
             if total < 1:
