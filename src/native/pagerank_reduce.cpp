@@ -11,7 +11,7 @@
 #include "node.h"
 
 using namespace std;
-#define EPSILON 0.0001
+#define EPSILON 0.00001
 #define ALPHA 0.85
 #define PATIENCE 30
 
@@ -21,6 +21,7 @@ double iter_block(map<uint32_t, Node> &nodes,
                   map<uint32_t, double> weights) {
     double resid = 0;
     for (auto &it : nodes) {
+//        if (abs(it.second.pageRank - it.second.oldPageRank) / it.second.pageRank < EPSILON) continue;
         double newPR = 0;
         uint32_t id = it.first;
         if (block_incomings.find(id) != block_incomings.end()) {
@@ -31,6 +32,7 @@ double iter_block(map<uint32_t, Node> &nodes,
         newPR += weights[id];
         newPR = ALPHA * newPR + (1 - ALPHA);
         resid += abs(it.second.pageRank - newPR) / newPR;
+//        it.second.oldPageRank = it.second.pageRank;
         it.second.pageRank = newPR;
     }
     return resid / nodes.size();
@@ -38,7 +40,7 @@ double iter_block(map<uint32_t, Node> &nodes,
 
 int main() {
 //        ifstream in(
-//            "C:\\Users\\Veniversum\\Documents\\a.School\\Caltech\\CS144\\rankmaniac\\src\\data\\1_aft_pagerank_map.txt");
+//            "C:\\Users\\Veniversum\\Documents\\a.School\\Caltech\\CS144\\rankmaniac\\src\\data\\reduce0.txt");
 //    cin.rdbuf(in.rdbuf());
     ios_base::sync_with_stdio(false);
     map<uint8_t, map<uint32_t, unordered_set<uint32_t>>> block_incomings;
@@ -56,17 +58,18 @@ int main() {
             block_id = static_cast<uint8_t>(stoul(header));
         }
         if (content[0] == 'N') {
-            // Node
+            // Node Info
             string id_str, inner_content;
             cin >> id_str >> inner_content;
             uint32_t id = stoul(id_str);
             nodes[block_id].emplace(id, Node(id, inner_content, true));
         } else if (content[0] == 'S') {
-            // Same block
+            // Same block weights
             string from_id, to_id;
             cin >> from_id >> to_id;
             block_incomings[block_id][stoul(to_id)].insert(stoul((from_id)));
         } else if (content[0] == 'O') {
+            // Outside weights
             string from_id, to_id, weight;
             cin >> from_id >> to_id >> weight;
             weights[block_id][stoul(to_id)] += stod(weight);
@@ -85,10 +88,6 @@ int main() {
             node.second.reemit();
         }
     }
-//    for (auto &node_pair : nodes) {
-//        node_pair.second.pageRank += weights[node_pair.first];
-//        node_pair.second.reemit();
-//    }
 
     return 0;
 }

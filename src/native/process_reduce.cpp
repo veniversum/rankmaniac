@@ -10,12 +10,12 @@
 //#include <fstream>
 #include "node.h"
 
-#define MAX_ITER 12
+#define MAX_ITER 2
 #define PATIENCE 1
 #define STRICTNESS 20
 #define ALPHA 0.85
-#define shared_weights (1.0 - ALPHA)
-#define EPSILON 0.001
+#define EPSILON 0.0001
+//0.066
 
 using namespace std;
 

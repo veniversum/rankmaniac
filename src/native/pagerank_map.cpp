@@ -27,7 +27,6 @@ int main() {
 //            ifstream in(
 //            "C:\\Users\\Veniversum\\Documents\\a.School\\Caltech\\CS144\\rankmaniac\\src\\data\\input.txt");
 //    cin.rdbuf(in.rdbuf());
-//    map<uint32_t, double> weights;
     ios_base::sync_with_stdio(false);
 
     string header;
@@ -44,16 +43,10 @@ int main() {
             header = header.substr(NODEID_OFFSET);
         }
         Node node(stoul(header), content, true);
-//        node.pageRank += weights[node.id];
-//        weights[node.id] = 0;
-//        double weightsAlongEdges = (node.pageRank) * ALPHA;
+
         node.oldPageRank = node.pageRank;
-//        visited.insert(node.id);
         if (node.outlinks_count > 0) {
-//            node.pageRank = (1-ALPHA);
             for (const auto &neighbor:node.outlinks) {
-//                emit_node_walk_line(neighbor,
-//                                    weightsAlongEdges / node.outlinks_count);
                 if (node.block_id == convert_to_block_id(neighbor)) {
                     emit_same_block_walk_line(node.block_id, node.id, neighbor);
                 } else {
@@ -62,21 +55,9 @@ int main() {
             }
         } else {
             // Hold on to the PageRank
-//            weights[node.id] += weightsAlongEdges;
-
-//            node.pageRank = (1-ALPHA) + weightsAlongEdges; // THIS LINE
             emit_same_block_walk_line(node.block_id, node.id, node.id);
-
-//            weights[node.id] = 0;
-//            emit_node_walk_line(node.id, weightsAlongEdges);
-//            node.pageRank = weightsAlongEdges;
         }
         node.reemit_block();
     }
-
-//    for (const auto &it:weights) {
-//        emit_node_walk_line(it.first, it.second);
-//    }
-
     return 0;
 }

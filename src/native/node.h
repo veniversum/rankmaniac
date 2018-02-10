@@ -9,7 +9,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstdio>
-#define NUM_REDUCERS 10
+#define NUM_REDUCERS 1
 
 using namespace std;
 
@@ -85,16 +85,4 @@ public:
 static inline uint8_t convert_to_block_id(const uint32_t id) {
     return static_cast<uint8_t>(id % NUM_REDUCERS);
 }
-
-
-//decode(char *content) {
-//    char *found;
-//    found = strsep(&content, "\t");
-//    if (found != NULL && found[0] == 'N') {
-//        return constructNode(found.strsep);
-//    }
-//    while ((found = strsep(&string, " ")) != NULL)
-//        printf("%s\n", found);
-//}
-
 #endif //RANKMANIAC_NODE_H
