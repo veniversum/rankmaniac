@@ -16,7 +16,7 @@ pagerank = 0
 old_pagerank = 0
 outlinks = None
 
-NODE_VISITORS = defaultdict(int)
+NODE_VISITORS = defaultdict(float)
 NODE_DATA = {}
 
 for line in sys.stdin:
@@ -28,7 +28,7 @@ for line in sys.stdin:
         NODE_DATA[node_id] = parts[1][5:-1]
         continue
 
-    NODE_VISITORS[node_id] += 1
+    NODE_VISITORS[node_id] += float(parts[1])
 
 for k, v in NODE_DATA.items():
     emit_node_info(k, v, NODE_VISITORS[k])

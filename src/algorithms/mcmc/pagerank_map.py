@@ -5,7 +5,8 @@ from random import random, randint
 
 ALPHA = 0.85
 EPSILON = 1 - ALPHA
-NUM_WALKS = 50
+NUM_WALKS = 500
+
 
 class Node:
     # Break down the input line into useful components
@@ -59,17 +60,15 @@ for line in sys.stdin.readlines():
         continue
     node = Node(line)
 
-    for k in range(int(node.pageRank * NUM_WALKS)):
-        if random() < ALPHA:
-            # Follow edge
-            out_node = node.id
-            if node.outlinks_count > 0:
-                out_idx = randint(0, node.outlinks_count - 1)
-                out_node = node.outlinks[out_idx]
-            Node.emit_node_walk_line(out_node, 'bla')
-        else:
-            # Reset randomly
-            Node.emit_node_walk_line('-1', '')
-            pass
+    samples = node.pageRank * NUM_WALKS
+    sample_follow_edges = samples * ALPHA
+    sample_redistribute = samples * EPSILON
+    if node.outlinks_count > 0:
+        for neighbor in node.outlinks:
+            Node.emit_node_walk_line(neighbor, sample_follow_edges / node.outlinks_count)
+    else:
+        Node.emit_node_walk_line(node.id, sample_follow_edges)
+
+    Node.emit_node_walk_line('-1', sample_redistribute)
 
     Node.emit_node_content_line(node.id, node.original_content)
